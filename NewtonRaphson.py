@@ -35,7 +35,7 @@ def newtonRaphson(K, M, gamma):
         for i in range(K):
             alpha_new[i]=alpha_0[i]-(get_g(alpha_0,i)-c)/(get_h(alpha_0,i))
 
-        if np.abs(alpha_0-alpha_new)>0.01: #convergence criterion
+        if np.abs(alpha_0-alpha_new)<0.01: #convergence criterion
             break
 
         alpha_0=alpha_new
