@@ -1,6 +1,5 @@
 import numpy as np
 from scipy.special import digamma, polygamma
-from math import sqrt
 
 def newtonRaphson(K, M, gamma):
     '''
