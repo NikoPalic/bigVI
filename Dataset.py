@@ -6,7 +6,8 @@ class DocumentLoader:
     def __init__(self, dataset="20news"): #needs list of documents
         if dataset=="20news":
             self.dataset=fetch_20newsgroups(subset="train").data
-
+        else:
+            self.dataset=dataset
 
     def lemmatize_stemming(self, token):
         return SnowballStemmer("english").stem(WordNetLemmatizer().lemmatize(token, pos='v'))
