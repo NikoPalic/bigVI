@@ -14,8 +14,11 @@ def VI(k, N, alpha, beta):
     #phi_0 = n x k matrix
     #gamma = k dimensional vector
     phi_0 = (1 / k) * np.ones(shape = (N,k))
-    gamma_0 = alpha + N / k
-
+    gamma_0 = []
+    for i in range(k):
+        gamma_0.append(alpha[i]+N/k)
+    gamma_0=np.array(gamma_0)
+        
     phi_t1 = np.zeros(shape = (N,k))        #Initialize empty matrix and vector
     gamma_t1 = np.zeros(shape = (k,))
     while (True):
