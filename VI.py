@@ -25,7 +25,7 @@ def VI(k, document, alpha, beta):
         for n in range(N):
             for i in range(k):
                 phi_t1[n, i] = beta[i, document[n]] * np.exp(
-                    digamma(gamma_0[i]))  # Something strange is going on with the digamma function
+                    digamma(gamma_0[i]) - digamma(np.sum(gamma_0)))  #There is a typo in the original paper.
             phi_t1 = normalize(phi_t1, axis=1, norm='l1')
         gamma_t1 = alpha + np.sum(phi_t1, axis=0)
 
