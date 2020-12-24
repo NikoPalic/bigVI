@@ -3,11 +3,12 @@ import gensim
 from nltk import WordNetLemmatizer, SnowballStemmer
 
 class DocumentLoader:
-    def __init__(self, dataset="20news"): #needs list of documents
+    def __init__(self, dataset="20news",cutoff=20): #needs list of documents
         if dataset=="20news":
-            self.dataset=fetch_20newsgroups(subset="train").data
+            self.dataset=fetch_20newsgroups(subset="train").data[:cutoff]
         else:
-            self.dataset=dataset
+            self.dataset = dataset[:cutoff]
+
 
     def lemmatize_stemming(self, token):
         return SnowballStemmer("english").stem(WordNetLemmatizer().lemmatize(token, pos='v'))
@@ -26,5 +27,12 @@ class DocumentLoader:
             L.append(self.preprocess_document(document))
         return L
 
-dl=DocumentLoader()
-print(dl.preprocess_dataset())
+    def get_vocabulary(self, L): #takes preprocessed list of documents
+        words=set()
+        for document in L:
+            for word in document:
+                words.add(word)
+        return list(words)
+
+#dl=DocumentLoader()
+#print(dl.preprocess_dataset())
