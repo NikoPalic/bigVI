@@ -1,5 +1,5 @@
 import numpy as np
-from VI import VI
+from VI import E_step, M_step
 from Dataset import DocumentLoader
 from NewtonRaphson import newtonRaphson
 
@@ -23,7 +23,7 @@ for document in L:
         beta_0.append(np.array(kth_topic_dist))
 
     while(True):
-        phi, gamma = VI(5,document, alpha_0, beta_0)
+        #phi, gamma = VI(5,document, alpha_0, beta_0)
         #TODO parameter (alpha, beta) estimation
         if ("convergence criterion"):
             break
