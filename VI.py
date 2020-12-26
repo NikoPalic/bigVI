@@ -2,6 +2,7 @@ import numpy as np
 from scipy.special import digamma
 from sklearn.preprocessing import normalize
 from NewtonRaphson import newtonRaphson
+from Dataset import DocumentLoader
 
 def E_step(k, document, alpha, beta):
     ''' Input:
@@ -29,7 +30,7 @@ def E_step(k, document, alpha, beta):
             phi_t1 = normalize(phi_t1, axis=1, norm='l1')
         gamma_t1 = alpha + np.sum(phi_t1, axis=0)
 
-        if np.abs(gamma_0 - gamma_t1).any() < 0.01:     # Need to implement proper convergence criterion
+        if np.abs(gamma_0 - gamma_t1).all() < 0.01:     # Need to implement proper convergence criterion
             break                                       # What is a good criterion?
         gamma_0=gamma_t1
 
@@ -39,33 +40,29 @@ def E_step(k, document, alpha, beta):
     '''
     return phi_t1, gamma_t1
 
-def M_step(k, corpus, V, alpha_guess, beta_guess):
+def M_step(K, corpus, V, alpha, beta):
     ''' Input:
-    k = number of topics
-    corpus = collection of M documents (each document is a sequence of N words)
+    K = number of topics
+    corpus = collection of M documents (each document is a sequence of N_i words)
     V = size of vocabulary
-    alpha_guess = vector (size k)
-    beta_guess = matrix (size (k x V))
+    alpha_guess = vector (size K)
+    beta_guess = matrix (size (K x V))
     '''
 
     M = len(corpus)
-    N = [corpus.shape[0] for document in corpus]         #Create list with lengths of each document in corpus
+    N = [len(document) for document in corpus]         #Create list with lengths of each document in corpus
 
     #Initializing phi and gamma
-    Phi = [np.ones((N[doc_length],k)) for doc_length in range(M)]               #This initialization does not seem to matter,
-    Gamma = np.array([alpha_0 + N[doc_length]/k for doc_length in range(M)])    #but I'll still do it since the original paper says so.
-
-    #Initializing beta and alpha
-    beta = beta_guess
-    alpha = alpha_guess
+    Phi = [np.ones((N[doc_index],K)) for doc_index in range(M)]               #This initialization does not seem to matter,
+    Gamma = np.array([alpha + N[doc_index]/K for doc_index in range(M)])    #but I'll still do it since the original paper says so.
 
     #Perform E-step on each document to update phis and gammas.
     while (True):
         for doc_num in range(M):
-            Phi[doc_num] , Gamma[doc_num] = E_step(k, corpus[doc_num], alpha_guess, beta_guess)
+            Phi[doc_num] , Gamma[doc_num] = E_step(K, corpus[doc_num], alpha, beta)
 
         #Updating beta
-        for i in range(k):
+        for i in range(K):
             for j in range(V):
                 b=0
                 for doc_num in range(M): #documents
@@ -74,16 +71,34 @@ def M_step(k, corpus, V, alpha_guess, beta_guess):
                     for n in range(N[doc_num]):
                         b += Phi[n,i] * doc[n,j]
                 beta[i,j] = b
-            beta = normalize(beta, axis=1, norm='l1')       #Normalizing beta
+        beta = normalize(beta, axis=1, norm='l1')       #Normalizing beta
 
         #Updating alpha
-        alpha = newtonRaphson(k, M, Gamma)
-
-        alpha_guess = alpha
-        beta_guess = beta
+        alpha = newtonRaphson(K, M, Gamma)
 
     '''Output:
     alpha = vector (size k)
     beta = matrix (k x V)? Or k x N. Need to do some testing first
     '''
     return alpha, beta
+
+def get_guesses(K, V): #initial alpha and beta
+    alpha_0 = np.random.random(K)
+    alpha_0 = alpha_0 / sum(alpha_0)  # normalize
+
+    beta_0 = []
+    for k in range(K):
+        kth_topic_dist = np.random.random(V)
+        kth_topic_dist = kth_topic_dist / sum(kth_topic_dist)
+        beta_0.append(np.array(kth_topic_dist))
+
+    return alpha_0, beta_0
+
+'''
+dl=DocumentLoader()
+corpus=dl.preprocess_dataset()
+K=5
+V=len(dl.get_vocabulary(corpus))
+alpha, beta = get_guesses(K,V)
+M_step(K,corpus,V, alpha, beta)
+'''
