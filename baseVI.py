@@ -1,29 +1,30 @@
 import numpy as np
-from VI import E_step, M_step
+from VI import full_VI
 from Dataset import DocumentLoader
-from NewtonRaphson import newtonRaphson
+np.random.seed(0)
 
 dl=DocumentLoader()
 L = dl.preprocess_dataset() #list of preprocessed documents
 vocabulary = dl.get_vocabulary(L)
 
 V = len(vocabulary)
-#assume k number of topics
-K = 5
-for document in L:
-    #guess initial alpha
-    alpha_0 = np.random(K)
-    alpha_0 = alpha_0/sum(alpha_0) #normalize
+M = len(L) #no of documents
+K = 5 #assume K number of topics
 
-    #guess initial beta
+def get_guesses(K, V): #initial alpha and beta
+    alpha_0 = np.random.random(K)
+
     beta_0 = []
     for k in range(K):
-        kth_topic_dist = np.random(V)
-        kth_topic_dist = kth_topic_dist/sum(kth_topic_dist)
+        kth_topic_dist = np.random.random(V)
+        kth_topic_dist = kth_topic_dist / sum(kth_topic_dist)
         beta_0.append(np.array(kth_topic_dist))
 
-    while(True):
-        #phi, gamma = VI(5,document, alpha_0, beta_0)
-        #TODO parameter (alpha, beta) estimation
-        if ("convergence criterion"):
-            break
+    return alpha_0, np.array(beta_0)
+
+alpha, beta = get_guesses(K,V)
+corpus = dl.get_vocab_doc_representation(L)
+
+alpha, beta = full_VI(K,corpus, V, alpha, beta)
+
+print(alpha, beta)
