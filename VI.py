@@ -16,31 +16,30 @@ def E_step(k, document, alpha, beta):
 
     # don't need phi_0? (1)
     # gamma = k dimensional vector
-    gamma_0 = []
+    gamma = []
     for i in range(k):
-        gamma_0.append(alpha[i] + N / k)
-    gamma_0 = np.array(gamma_0)
+        gamma.append(alpha[i] + N / k)
+    gamma = np.array(gamma)
 
-    phi_t1 = np.zeros(shape=(N, k))  # Initialize empty matrix and vector
-    while (True):
+    phi = np.zeros(shape=(N, k))  # Initialize empty matrix and vector
+
+    iteration=0
+    while (iteration<20):
+        iteration+=1
         for n in range(N):
             for i in range(k):
-                phi_t1[n, i] = beta[i, document[n]] * np.exp(
-                    digamma(gamma_0[i]) - digamma(np.sum(gamma_0)))  #There is a typo in the original paper.
-            phi_t1 = normalize(phi_t1, axis=1, norm='l1')
-        gamma_t1 = alpha + np.sum(phi_t1, axis=0)
-
-        if np.abs(gamma_0 - gamma_t1).all() < 0.01:     # Need to implement proper convergence criterion
-            break                                       # What is a good criterion?
-        gamma_0=gamma_t1
+                phi[n, i] = beta[i, document[n]] * np.exp(
+                    digamma(gamma[i]) - digamma(np.sum(gamma)))  #There is a typo in the original paper.
+            phi = normalize(phi, axis=1, norm='l1')
+        gamma = alpha + np.sum(phi, axis=0)                                     # What is a good criterion?
 
     ''' Output:
     phi_t1 = matrix (size N x k)? OR V x k.
     gamma_t1 = vector (size K)
     '''
-    return phi_t1, gamma_t1
+    return phi, gamma
 
-def M_step(K, corpus, V, alpha, beta):
+def full_VI(K, corpus, V, alpha, beta):
     ''' Input:
     K = number of topics
     corpus = collection of M documents (each document is a sequence of N_i words)
@@ -53,11 +52,13 @@ def M_step(K, corpus, V, alpha, beta):
     N = [len(document) for document in corpus]         #Create list with lengths of each document in corpus
 
     #Initializing phi and gamma
-    Phi = [np.ones((N[doc_index],K)) for doc_index in range(M)]               #This initialization does not seem to matter,
+    Phi = np.array([np.ones((N[doc_index],K)) for doc_index in range(M)])               #This initialization does not seem to matter,
     Gamma = np.array([alpha + N[doc_index]/K for doc_index in range(M)])    #but I'll still do it since the original paper says so.
 
     #Perform E-step on each document to update phis and gammas.
-    while (True):
+    iteration=0
+    while (iteration<20):
+        iteration+=1
         for doc_num in range(M):
             Phi[doc_num] , Gamma[doc_num] = E_step(K, corpus[doc_num], alpha, beta)
 
@@ -67,9 +68,10 @@ def M_step(K, corpus, V, alpha, beta):
                 b=0
                 for doc_num in range(M): #documents
                     doc = corpus[doc_num]
-                    Phi = Phi[doc_num]
+                    Phi_d = Phi[doc_num]
                     for n in range(N[doc_num]):
-                        b += Phi[n,i] * doc[n,j]
+                        if doc[n]==j:
+                            b += Phi_d[n,i]
                 beta[i,j] = b
         beta = normalize(beta, axis=1, norm='l1')       #Normalizing beta
 
@@ -82,23 +84,3 @@ def M_step(K, corpus, V, alpha, beta):
     '''
     return alpha, beta
 
-def get_guesses(K, V): #initial alpha and beta
-    alpha_0 = np.random.random(K)
-    alpha_0 = alpha_0 / sum(alpha_0)  # normalize
-
-    beta_0 = []
-    for k in range(K):
-        kth_topic_dist = np.random.random(V)
-        kth_topic_dist = kth_topic_dist / sum(kth_topic_dist)
-        beta_0.append(np.array(kth_topic_dist))
-
-    return alpha_0, beta_0
-
-'''
-dl=DocumentLoader()
-corpus=dl.preprocess_dataset()
-K=5
-V=len(dl.get_vocabulary(corpus))
-alpha, beta = get_guesses(K,V)
-M_step(K,corpus,V, alpha, beta)
-'''
