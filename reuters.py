@@ -29,7 +29,6 @@ train_labels = mlb.fit_transform([reuters.categories(doc_id) for doc_id in train
 test_labels = mlb.transform([reuters.categories(doc_id) for doc_id in test_docs_id])
 
 train_labels_test = [reuters.categories(doc_id) for doc_id in train_docs_id]
-print(train_labels_test)
 
 # Classifier
 classifier = OneVsRestClassifier(LinearSVC())
