@@ -19,4 +19,11 @@ def classifier(train_docs, train_labels, test_docs,test_labels):
     
     return preds, acc
 
+## Standard SVM
+
+def SVM(X_train, Y_train, test):
+    clf = LinearSVC()
+    clf.fit(X,Y)
+    pred = clf.predict(test)
+    return pred 
 
