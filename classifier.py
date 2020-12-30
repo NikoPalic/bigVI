@@ -1,35 +1,22 @@
-from nltk.corpus import reuters, stopwords
-from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.preprocessing import MultiLabelBinarizer
+from sklearn.multiclass import OneVsRestClassifier
+from sklearn.svm import LinearSVC
+from sklearn.metrics import accuracy_score
+
+## Takes vectorized docs and outputs predictions
+
+def classifier(train_docs, train_labels, test_docs,test_labels):
+    mlb = MultiLabelBinarizer()
+    train_labels_mlb = mlb.fit_transform(train_labels)
+    test_labels_mlb = mlb.transform(test_labels)
+
+    clf = OneVsRestClassifier(LinearSVC())
+    clf.fit(train_docs,train_labels_mlb)
+    preds = clf.predict(test_docs)
+
+    # Accuracy
+    acc = accuracy_score(test_labels_mlb, preds)
+    
+    return preds, acc
 
 
-def main():
-    cats = reuters.categories()
-    test = len(cats)
-    fileids = reuters.fileids()
-    stop_words = stopwords.words('english')
-
-
-    # Listing document ids
-    documents = reuters.fileids()
-    train_docs_id = list(filter(lambda doc: doc.startswith('train'),documents))
-    test_docs_id = list(filter(lambda doc: doc.startswith('test'),documents))
-
-    # Splitting dataset
-    train_docs = [reuters.raw(doc_id) for doc_id in train_docs_id]
-    test_docs = [reuters.raw(doc_id) for doc_id in test_docs_id]
-
-    # Preprocessing - Subject to change
-    vectorize = CountVectorizer(stop_words=stop_words)
-    vectorize_train_docs = vectorizer.fit_transform(train_docs)
-    vectorize_test_docs = vectorize.transform(test_docs)
-
-    # Presenting
-    print("Loaded the Reuters-21578 Dataset....")
-    print("\n The dataset has",len(fileids),"documents.")
-    print("\n The dataset has",len(cats),"categories/topics.")
-    print("\n")
-
-
-if __name__ == "__main__":
-    main()
