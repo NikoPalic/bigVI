@@ -14,12 +14,18 @@ def newtonRaphson(K, M, gamma):
             suma+=digamma(gamma[d,i])-digamma(sum(gamma[d]))
         return suma
     def get_z(alpha):
-        return -polygamma(1,sum(alpha))
+        #return -polygamma(1,sum(alpha)) #as in paper
+        return M*polygamma(1,sum(alpha)) #as in Slack
     def get_h(alpha, i): #diagonal vector of Hessian, at index i
-        return M*polygamma(1,alpha[i])
+        #return M*polygamma(1,alpha[i]) #as in paper
+        return -M*polygamma(1,alpha[i]) #as in Slack
 
-    alpha_0=np.zeros(shape=(K,)) #initial guess
-    while (True):
+    alpha_0=np.ones(shape=(K,)) #initial guess
+    
+    iterations = 0
+    while (iterations < 30):
+        iterations+=1
+        
         #calculate c
         c_num=0
         for j in range(K):
@@ -33,9 +39,6 @@ def newtonRaphson(K, M, gamma):
         alpha_new=np.zeros(shape=(K,))
         for i in range(K):
             alpha_new[i]=alpha_0[i]-(get_g(alpha_0,i)-c)/(get_h(alpha_0,i))
-
-        if np.abs(alpha_0-alpha_new)<0.01: #convergence criterion
-            break
 
         alpha_0=alpha_new
 
