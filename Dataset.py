@@ -47,10 +47,20 @@ class DocumentLoader:
         self.vocabulary = vocabulary
         return vocabulary
 
-    def get_count_vectorizer(self, L):
-        vectorizer = CountVectorizer(analyzer=lambda x:x)
-        X = vectorizer.fit_transform(L)
-        return X.toarray()
+     def my_count_vectorizer(self, L, vocabulary):
+        D = dict()
+        cnt = 0
+        for word in vocabulary:
+            D[word] = cnt;
+            cnt += 1
+
+        DTM = np.zeros(shape=(len(L), len(vocabulary)))
+        for (index, document) in enumerate(L):
+            for word in document:
+                if word in vocabulary:
+                    DTM[index, D[word]] += 1
+        return DTM
+
 
     def get_vocab_doc_representation(self, L): #e.g. doc_1 (size 1 x N_i) = [3,4,1,2,5,7,...]; 4 = 4th word in vocabulary
         if not self.vocabulary:
