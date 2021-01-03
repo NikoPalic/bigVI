@@ -11,7 +11,7 @@ V = len(vocabulary)
 M = len(L) #no of documents
 K = 5 #assume K number of topics
 
-def get_guesses(K, V): #initial alpha and beta
+def get_guesses(K, V, M): #initial alpha, beta and gamma
     alpha_0 = np.random.random(K)
 
     beta_0 = []
@@ -20,7 +20,13 @@ def get_guesses(K, V): #initial alpha and beta
         kth_topic_dist = kth_topic_dist / sum(kth_topic_dist)
         beta_0.append(np.array(kth_topic_dist))
 
-    return alpha_0, np.array(beta_0)
+    gamma_0 = []
+    for m in range(M):
+        mth_topic_dist = np.random.random(K)
+        mth_topic_dist = mth_topic_dist / sum(mth_topic_dist)
+        gamma_0.append(np.array(mth_topic_dist))
+
+    return alpha_0, np.array(beta_0), np.array(gamma_0)
 
 alpha, beta = get_guesses(K,V)
 corpus = dl.get_vocab_doc_representation(L)
