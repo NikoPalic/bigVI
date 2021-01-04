@@ -72,7 +72,7 @@ def newtonRaphson2(K, M, gamma, alpha):
     K=number of topics
     M=number of documents
     gamma=matrix (size M x K) of variational parametres gamma
-    alpha=vector (size K) of Dirichlet concentration parametres
+    alpha=vector (size K) of Dirichlet concentration parametres (prior belief)
     '''
 
     def get_g(alpha, i):  # gradient of alpha_i
@@ -107,7 +107,11 @@ def newtonRaphson2(K, M, gamma, alpha):
         for i in range(K):
             alpha_new[i] = alpha[i] - (get_g(alpha, i) - c) / (get_h(alpha, i))
 
+        if sqrt(mean(square(alpha - alpha_new))) < 0.01:
+            #print("Newton-Raphson2: \tCondition met at iteration ",iterations)
+            break
         alpha = alpha_new
+
 
     return alpha
 
