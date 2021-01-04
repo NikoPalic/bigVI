@@ -3,6 +3,26 @@ from scipy.special import digamma
 from sklearn.preprocessing import normalize
 from NewtonRaphson import *
 
+'''NOTE: lowecase gamma and phi are for a certain document
+         uppercase Gamma and Phi are for the whole corpus'''
+
+#################################################################################################
+DD=dict() # for performance optimization only
+def assemble_dict_to_dict_word_to_position(corpus):
+    def get_dict_word_to_position(document):
+        D = dict()
+        for position, word in enumerate(document):
+            if word not in D:
+                D[word] = [position]
+            else:
+                D[word].append(position)
+        return D
+
+    for doc_num, document in enumerate(corpus):
+        D = get_dict_word_to_position(document)
+        DD[doc_num]=D.copy()
+#################################################################################################
+
 def E_phi(beta,gamma,document,k):
     N = len(document)
     phi = np.zeros(shape=(N, k))  # Initialize empty matrix and vector
@@ -21,17 +41,16 @@ def E_gamma(alpha,phi):
 def M_beta(Phi, corpus, k, V):
     beta=np.zeros(shape=(k,V))
     M=len(corpus)
-    N = [len(document) for document in corpus]
 
-    for i in range(k):
-        for j in range(V):
+    for i in range(k): #topic
+        for j in range(V): #word
             b = 0
-            for doc_num in range(M):  # documents
-                doc = corpus[doc_num]
-                Phi_d = Phi[doc_num]
-                for n in range(N[doc_num]): #could be optimized
-                    if doc[n] == j:
-                        b += Phi_d[n, i]
+            for doc_num in range(M):  # document index
+                phi = Phi[doc_num]
+                positions = DD[doc_num].get(j)
+                if positions != None:
+                    for n in positions: #position
+                        b += phi[n,i]
             beta[i, j] = b
     beta = normalize(beta, axis=1, norm='l1')
     return beta
@@ -41,6 +60,7 @@ def M_alpha(alpha, Gamma, M, k):
     return alpha
 
 def full_VI(k, corpus, V, alpha, beta, Gamma):
+    assemble_dict_to_dict_word_to_position(corpus)
     M = len(corpus)
 
     for iteration in range(500):
