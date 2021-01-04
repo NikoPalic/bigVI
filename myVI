@@ -7,14 +7,11 @@ def E_phi(beta,gamma,document,k):
     N = len(document)
     phi = np.zeros(shape=(N, k))  # Initialize empty matrix and vector
 
-    iteration = 0
-    while (iteration < 20):
-        iteration += 1
-        for n in range(N):
-            for i in range(k):
-                phi[n, i] = beta[i, document[n]] * np.exp(
-                    digamma(gamma[i]) - digamma(np.sum(gamma)))  # There is a typo in the original paper.
-        phi = normalize(phi, axis=1, norm='l1')
+    for n in range(N):
+        for i in range(k):
+            phi[n, i] = beta[i, document[n]] * np.exp(
+                digamma(gamma[i]) - digamma(np.sum(gamma)))  # There is a typo in the original paper.
+    phi = normalize(phi, axis=1, norm='l1') #should maybe normalize by different axis?
     return phi
 
 def E_gamma(alpha,phi):
@@ -32,15 +29,15 @@ def M_beta(Phi, corpus, k, V):
             for doc_num in range(M):  # documents
                 doc = corpus[doc_num]
                 Phi_d = Phi[doc_num]
-                for n in range(N[doc_num]):
+                for n in range(N[doc_num]): #could be optimized
                     if doc[n] == j:
                         b += Phi_d[n, i]
             beta[i, j] = b
     beta = normalize(beta, axis=1, norm='l1')
     return beta
 
-def M_alpha(alpha, gamma, M, k):
-    alpha = newtonRaphson2(k, M, gamma, alpha)
+def M_alpha(alpha, Gamma, M, k):
+    alpha = newtonRaphson2(k, M, Gamma, alpha)
     return alpha
 
 def full_VI(k, corpus, V, alpha, beta, Gamma):
@@ -53,7 +50,6 @@ def full_VI(k, corpus, V, alpha, beta, Gamma):
         Phi = []
         for doc_num in range(M):
             document = corpus[doc_num]
-            N = len(document)
             gamma = Gamma[doc_num]
 
             phi = E_phi(beta, gamma, document, k)
@@ -75,6 +71,7 @@ def full_VI(k, corpus, V, alpha, beta, Gamma):
         #update alpha (k)
         alpha = M_alpha(alpha, Gamma, M, k)
 
-        print(alpha)
+        print("Alpha\t", alpha)
+        print("Beta\t", beta)
 
     return alpha, beta
