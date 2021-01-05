@@ -106,6 +106,9 @@ def newtonRaphson2(K, M, gamma, alpha):
         alpha_new = np.zeros(shape=(K,))
         for i in range(K):
             alpha_new[i] = alpha[i] - (get_g(alpha, i) - c) / (get_h(alpha, i))
+            if alpha_new[i]<=0:
+                alpha_new[i]=0.000000001 #prevent non-positive values forcibly :_(
+                print("Newton-Raphson::reset")
 
         if sqrt(mean(square(alpha - alpha_new))) < 0.01:
             #print("Newton-Raphson2: \tCondition met at iteration ",iterations)
