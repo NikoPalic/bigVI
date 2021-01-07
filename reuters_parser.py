@@ -136,7 +136,6 @@ def reuters_parse_multiple(filenames, binary_topic):
                     corpus.append(text)
                     classes.append(class_id)
                 
-    return classes, corpus
         
     return classes, corpus
 
