@@ -1,4 +1,5 @@
-#### Work in progress
+
+# Work in progress
 
 from bs4 import BeautifulSoup
 
@@ -12,7 +13,7 @@ with open(filename,"r") as file:
 # Each article in the set is opened and closed with a <REUTERS> </REUTERS> tag
 dataset = soup.find_all("reuters")
 x = dataset[0].find_all("topics")
-print(x)
+print(len(dataset))
 
 topics = []
 one = dataset[0].find_all("topics")[0].find_all('d')[0].get_text()
@@ -38,7 +39,7 @@ def parse_reuters(filename, binary_topic):
     ----------
     filename : Specified path
     
-    topics : string,
+    binary_topic : string,
         
         Specifies the topic assign for the OneVSRest classification in the paper. 
         
@@ -62,19 +63,20 @@ def parse_reuters(filename, binary_topic):
     # Each article in the set is opened and closed with a <REUTERS> </REUTERS> tag
     dataset = soup.find_all("reuters")
     for article in dataset:
-        if article["topics"] == "NO":
-            topics.append(0)
-        else:
-            
+        if article["topics"] == "YES": # See notes in readme about topics tag
+            body = article.find_all("body")
+            corpus.append(body)
             topic = article.find_all("topics")[0].find_all('d')
+            
             for i in range(len(topic)):
                 if topic[i].get_text() == binary_topic:
                     topics.append(1)
                 else:
                     topics.append(0)
-
-    return topics
+                
+        
+    return topics, corpus
         
 
-topics = parse_reuters(filename,"grain")
-print(topics)
+topics, corpus = parse_reuters(filename,"grain")
+print(corpus[0])
