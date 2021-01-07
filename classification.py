@@ -1,6 +1,4 @@
 from reuters_parser import reuters_parse_multiple
-import numpy as np
-
 # List of filenames
 filenames_full = ["data/reuters21578/reut2-000.sgm", "data/reuters21578/reut2-001.sgm",
              "data/reuters21578/reut2-002.sgm", "data/reuters21578/reut2-003.sgm",
