@@ -1,36 +1,20 @@
-
-# Work in progress
-
 from bs4 import BeautifulSoup
 
 # Grabbing filename
-filename = "data/reuters21578/reut2-000.sgm"
+filename = "data/reuters21578/reut2-002.sgm"
 
-# Opening the file and making the soup
-with open(filename,"r") as file:
-    soup = BeautifulSoup(file, features="html.parser")
-
-# Each article in the set is opened and closed with a <REUTERS> </REUTERS> tag
-dataset = soup.find_all("reuters")
-x = dataset[0].find_all("topics")
-print(len(dataset))
-
-topics = []
-one = dataset[0].find_all("topics")[0].find_all('d')[0].get_text()
-two = dataset[1].find_all("topics")[0].find_all('d')
-three = dataset[2].find_all("topics")[0].find_all('d')
-topics.append(one)
-topics.append(two)
-topics.append(three)
-print(topics)
-
-for i in range(len(topics)):
-    top = topics[i]
-    if top == "cocoa":
-        print("Found it")
+# Running some tests & experiments with dataset
+def testing():
+    with open(filename,"r") as file:
+        soup = BeautifulSoup(file, features="html.parser")
         
+    dataset = soup.find_all("reuters")
+    
+    topic = dataset[0].find_all("topics")
+    print(topic)
 
 
+# Main parser function
 def parse_reuters(filename, binary_topic):
     
     """
@@ -73,10 +57,10 @@ def parse_reuters(filename, binary_topic):
                     topics.append(1)
                 else:
                     topics.append(0)
-                
         
     return topics, corpus
         
 
 topics, corpus = parse_reuters(filename,"grain")
 print(corpus[0])
+testing()
