@@ -67,38 +67,40 @@ def full_VI(k, corpus, V, alpha, beta, Gamma):
     M = len(corpus)
 
     for iteration in range(10):
-        #print("iteration ", iteration)
+        print("iteration ", iteration)
 
         #update Phi (M x N_i x k)
+        print("-------------------------------")
+        print("Updating Phi")
+
         Phi = []
-        start = time.clock()
         for doc_num in range(M):
             document = corpus[doc_num]
             gamma = Gamma[doc_num]
             phi = E_phi(beta, gamma, document, k)
             Phi.append(phi)
         Phi = np.array(Phi);
-        print("Phi update step took: ",(time.clock() - start))
+
 
         #update Gamma (M x k)
         Gamma = []
-        start = time.clock()
+        print("Updating Gamma")
         for doc_num in range(M):
             phi = Phi[doc_num]
             gamma = E_gamma(alpha, phi)
             Gamma.append(gamma)
         Gamma = np.array(Gamma);
-        print("Gamma update step took: ",(time.clock() - start))
+
 
         #update beta (k x V)
-        start = time.clock()
+        print("Updating Beta")
         beta = M_beta(Phi, corpus, k, V)
-        print("Beta update step took: ",(time.clock() - start))
+
 
         #update alpha (k)
-        start = time.clock()
+        print("Updating Alpha")
         alpha = M_alpha(alpha, Gamma, M, k)
-        print("Alpha update step took: ",(time.clock() - start))
+        print("-------------------------------")
 
         #print("Alpha\t", alpha)
         #print("Beta\t", beta)
