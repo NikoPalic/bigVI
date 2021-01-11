@@ -3,6 +3,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 from sklearn.svm import SVC
 from sklearn.feature_extraction.text import CountVectorizer
+import matplotlib.pyplot as plt
 
 
 # List of filenames
@@ -29,18 +30,22 @@ filenames_testing = ["data/reuters21578/reut2-000.sgm", "data/reuters21578/reut2
              "data/reuters21578/reut2-020.sgm", "data/reuters21578/reut2-021.sgm"
              ]
 
-classes, corpus = reuters_parse_multiple(filenames_testing,"grain")
-
+classes, corpus = reuters_parse_multiple(filenames_testing,"earn")
 
 
 vectorizer = CountVectorizer(stop_words="english")
-
 X = vectorizer.fit_transform(corpus)
 
-X_train, X_test,y_train, y_test = train_test_split(X, classes, train_size = 0.2, random_state = 42)
-
-
 clf = SVC()
-clf.fit(X_train,y_train)
-preds = clf.predict(X_test)
-score = accuracy_score(y_test, preds)
+
+
+sizes = [0.01, 0.05, 0.1, 0.2]
+scores = []
+for i in sizes:
+    X_train, X_test,y_train, y_test = train_test_split(X, classes, train_size = i, random_state = 42)
+    clf.fit(X_train,y_train)
+    preds = clf.predict(X_test)
+    score = accuracy_score(y_test, preds)
+    scores.append(score)
+
+plt.scatter(sizes,scores)
