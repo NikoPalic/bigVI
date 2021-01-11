@@ -2,7 +2,7 @@ import numpy as np
 from VI import full_VI
 from Dataset import DocumentLoader
 import myVI
-import VI_smoothing
+#import VI_smoothing
 from analyzeResults import *
 np.random.seed(1)
 
@@ -38,7 +38,7 @@ corpus = dl.get_vocab_doc_representation(L)
 alpha, beta, Gamma, Phi = myVI.full_VI(K,corpus, V, alpha, beta, gamma)
 #alpha, beta = VI_smoothing.full_VI(K,corpus, V, alpha, beta, gamma)
 
-print(alpha, beta)
+#print(alpha, beta)
 
-top_words_per_topic(beta, vocabulary)
-most_likely_topic_per_word_in_document(Phi, 0, L[0], vocabulary)
+#top_words_per_topic(beta, vocabulary)
+#most_likely_topic_per_word_in_document(Phi, 0, L[0], vocabulary)

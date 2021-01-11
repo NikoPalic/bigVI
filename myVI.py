@@ -2,6 +2,7 @@ import numpy as np
 from scipy.special import digamma
 from sklearn.preprocessing import normalize
 from NewtonRaphson import *
+import time
 
 '''NOTE: lowecase gamma and phi are for a certain document
          uppercase Gamma and Phi are for the whole corpus'''
@@ -27,11 +28,14 @@ def E_phi(beta,gamma,document,k):
     N = len(document)
     phi = np.zeros(shape=(N, k))  # Initialize empty matrix and vector
 
-    for n in range(N):
-        for i in range(k):
-            phi[n, i] = beta[i, document[n]] * np.exp(
-                digamma(gamma[i]) - digamma(np.sum(gamma)))  # There is a typo in the original paper.
-    phi = normalize(phi, axis=1, norm='l1') #should maybe normalize by different axis?
+    phi = np.multiply(beta.T[document,], np.exp(           #Optimizing performance by reducing the entire thing down to
+       digamma(gamma) - digamma(np.sum(gamma))))           #a matrix operation.
+    # for n in range(N):
+    #     for i in range(k):
+    #         phi[n, i] = beta[i, document[n]] * np.exp(
+    #             digamma(gamma[i]) - digamma(np.sum(gamma)))  # There is a typo in the original paper.
+    #
+    phi = normalize(phi, axis=1, norm='l1')
     return phi
 
 def E_gamma(alpha,phi):
@@ -41,7 +45,6 @@ def E_gamma(alpha,phi):
 def M_beta(Phi, corpus, k, V):
     beta=np.zeros(shape=(k,V))
     M=len(corpus)
-
     for i in range(k): #topic
         for j in range(V): #word
             b = 0
@@ -64,34 +67,40 @@ def full_VI(k, corpus, V, alpha, beta, Gamma):
     M = len(corpus)
 
     for iteration in range(10):
-        print("iteration ", iteration)
+        #print("iteration ", iteration)
 
         #update Phi (M x N_i x k)
         Phi = []
+        start = time.clock()
         for doc_num in range(M):
             document = corpus[doc_num]
             gamma = Gamma[doc_num]
-
             phi = E_phi(beta, gamma, document, k)
             Phi.append(phi)
         Phi = np.array(Phi);
+        print("Phi update step took: ",(time.clock() - start))
 
         #update Gamma (M x k)
         Gamma = []
+        start = time.clock()
         for doc_num in range(M):
             phi = Phi[doc_num]
-
             gamma = E_gamma(alpha, phi)
             Gamma.append(gamma)
         Gamma = np.array(Gamma);
+        print("Gamma update step took: ",(time.clock() - start))
 
         #update beta (k x V)
+        start = time.clock()
         beta = M_beta(Phi, corpus, k, V)
+        print("Beta update step took: ",(time.clock() - start))
 
         #update alpha (k)
+        start = time.clock()
         alpha = M_alpha(alpha, Gamma, M, k)
+        print("Alpha update step took: ",(time.clock() - start))
 
-        print("Alpha\t", alpha)
+        #print("Alpha\t", alpha)
         #print("Beta\t", beta)
 
     return alpha, beta, Gamma, Phi

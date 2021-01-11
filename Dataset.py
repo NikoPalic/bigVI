@@ -9,7 +9,7 @@ TODO: dataset has some info on author at beginning of each document -> remove it
 '''
 
 class DocumentLoader:
-    def __init__(self, dataset="20news",cutoff=20): #needs list of documents
+    def __init__(self, dataset="20news",cutoff=1000): #needs list of documents
         if dataset=="20news":
             self.dataset=fetch_20newsgroups(subset="train").data[:cutoff]
         else:
@@ -47,7 +47,7 @@ class DocumentLoader:
         self.vocabulary = vocabulary
         return vocabulary
 
-     def my_count_vectorizer(self, L, vocabulary):
+    def my_count_vectorizer(self, L, vocabulary):
         D = dict()
         cnt = 0
         for word in vocabulary:
