@@ -1,31 +1,4 @@
 from bs4 import BeautifulSoup
-
-# Grabbing filename
-filename = "data/reuters21578/reut2-002.sgm"
-
-# Running some tests & experiments with dataset
-def testing():
-    with open(filename,"r") as file:
-        soup = BeautifulSoup(file, features="html.parser")
-    
-    # Testing out topic extraction
-    dataset = soup.find_all("reuters")
-    print(dataset[7].find_all("topics")[0].find_all("d"))
-    topics = dataset[7].find_all("topics")[0].find_all("d")
-    for topic in topics:
-        print(topic.text)
-    
-    # Experinemt for debugging
-    # Output shows that we have some missing datapoints
-    # Use date to find the articles in the raw dataset
-    for article in dataset:
-        body = article.find_all("body")
-        
-        if len(body) == 0:
-            date = article.find_all("date")
-            print(date)
-            
-
 ## Parser for single file
 def reuters_parse_single(filename, binary_topic):
     
@@ -106,16 +79,11 @@ def reuters_parse_multiple(filenames, binary_topic):
     corpus = []
     # Stores the corresponding topic
     classes = []
-    
-    filenames = ["data/reuters21578/reut2-000.sgm", "data/reuters21578/reut2-001.sgm",
-             "data/reuters21578/reut2-002.sgm", "data/reuters21578/reut2-003.sgm",
-             "data/reuters21578/reut2-004.sgm", "data/reuters21578/reut2-005.sgm",
-             "data/reuters21578/reut2-006.sgm", "data/reuters21578/reut2-007.sgm",
-             ]
+
     
     for file in filenames:
         # Opening the file and making the soup
-        with open(filename,"r") as file:
+        with open(file,"r") as file:
             soup = BeautifulSoup(file, features="html.parser")
         
         # Each article in the set is opened and closed with a <REUTERS> </REUTERS> tag
@@ -138,16 +106,3 @@ def reuters_parse_multiple(filenames, binary_topic):
                 
         
     return classes, corpus
-
-#### Testing
-classes, corpus = reuters_parse_single(filename,"grain")
-
-filenames = ["data/reuters21578/reut2-000.sgm", "data/reuters21578/reut2-001.sgm",
-             "data/reuters21578/reut2-002.sgm", "data/reuters21578/reut2-003.sgm",
-             "data/reuters21578/reut2-004.sgm", "data/reuters21578/reut2-005.sgm",
-             "data/reuters21578/reut2-006.sgm", "data/reuters21578/reut2-007.sgm",
-             ]
-classes_branch, corpus_branch = reuters_parse_multiple(filenames,"grain")
-#print(corpus[0])
-testing()
-
