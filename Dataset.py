@@ -4,14 +4,10 @@ from nltk import WordNetLemmatizer, SnowballStemmer
 from sklearn.feature_extraction.text import CountVectorizer
 import numpy as np
 
-'''
-TODO: dataset has some info on author at beginning of each document -> remove it!
-'''
-
 class DocumentLoader:
-    def __init__(self, dataset="20news",cutoff=1000): #needs list of documents
+    def __init__(self, dataset="20news",cutoff=10000): #needs list of documents
         if dataset=="20news":
-            self.dataset=fetch_20newsgroups(subset="train").data[:cutoff]
+            self.dataset=fetch_20newsgroups(subset="train", remove=('headers', 'footers', 'quotes')).data[:cutoff]
         else:
             self.dataset = dataset[:cutoff]
         self.vocabulary=None
@@ -31,7 +27,9 @@ class DocumentLoader:
     def preprocess_dataset(self):
         L=[]
         for document in self.dataset:
-            L.append(self.preprocess_document(document))
+            processed = self.preprocess_document(document)
+            if len(processed)>0:
+                L.append(processed)
         return L
 
     def get_vocabulary(self, L): #takes preprocessed list of documents
@@ -77,5 +75,6 @@ class DocumentLoader:
             for word in document:
                 if word in D:
                     doc_new.append(D[word])
-            L_new.append(np.array(doc_new))
+            if len(doc_new)>0:
+                L_new.append(np.array(doc_new))
         return np.array(L_new)
