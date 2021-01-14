@@ -1,19 +1,12 @@
 import numpy as np
-from VI import full_VI
 from Dataset import DocumentLoader
 import myVI
-#import VI_smoothing
 from analyzeResults import *
 np.random.seed(1)
 
 dl=DocumentLoader()
 L = dl.preprocess_dataset() #list of preprocessed documents
 vocabulary = dl.get_vocabulary(L)
-
-V = len(vocabulary)
-M = len(L) #no of documents
-K = 10 #assume K number of topics
-
 
 def get_guesses(K, V, M): #initial alpha, beta and gamma
     alpha_0 = np.random.random(K)
@@ -32,13 +25,16 @@ def get_guesses(K, V, M): #initial alpha, beta and gamma
 
     return alpha_0, np.array(beta_0), np.array(gamma_0)
 
-alpha, beta, gamma = get_guesses(K, V, M)
 corpus = dl.get_vocab_doc_representation(L)
 
+V = len(vocabulary)
+M = len(corpus) #no of documents
+K = 20 #assume K number of topics
+
+alpha, beta, gamma = get_guesses(K, V, M)
+
 alpha, beta, Gamma, Phi = myVI.full_VI(K,corpus, V, alpha, beta, gamma)
-#alpha, beta = VI_smoothing.full_VI(K,corpus, V, alpha, beta, gamma)
 
-#print(alpha, beta)
-
-#top_words_per_topic(beta, vocabulary)
-#most_likely_topic_per_word_in_document(Phi, 0, L[0], vocabulary)
+print("RESULTS::::: size=",len(corpus), ", topics=",K)
+top_words_per_topic(beta, vocabulary)
+most_likely_topic_per_word_in_document(Phi, 0, L[0], vocabulary)
