@@ -2,8 +2,14 @@ import numpy as np
 import sys
 import myVI
 
-
 def predictive_perplexity(K, corpus, alpha, beta, V, gamma):
+    ''' Input:
+    K = number of topics
+    corpus = collection of M documents
+                (each document is a sequence of N_i integer numbers (numbers correspond to indices at vocabulary))
+    alpha = vector (size K) - optimized alpha parameters
+    beta = matrix (size (K x V)) -optimized beta parameters
+    '''
 
     M = len(corpus)
     N = [len(document) for document in corpus]
@@ -19,10 +25,15 @@ def predictive_perplexity(K, corpus, alpha, beta, V, gamma):
 
 
 def likelihood_of_movie(K, document, alpha, beta, V, gamma):
-
+    ''' Input:
+    K = number of topics
+    document = sequence of N_i integer numbers (numbers correspond to indices at vocabulary))
+    alpha = vector (size K) - optimized alpha parameters
+    beta = matrix (size (K x V)) -optimized beta parameters
+    '''
     N_i = len(document)
-    #print(np.shape(  np.reshape(document[0:N_i-1], np.shape(document[0:N_i-1]) + (1,))  ))
-    #print(np.shape(np.squeeze(np.reshape(document[0:N_i - 1], np.shape(document[0:N_i - 1]) + (1,)))))
+    print(np.shape(  np.reshape(document[0:N_i-1], np.shape(document[0:N_i-1]) + (1,))  ))
+    print(np.shape(np.squeeze(np.reshape(document[0:N_i - 1], np.shape(document[0:N_i - 1]) + (1,)))))
     Gamma, Phi = myVI.VI_for_phi_gamma(K, np.reshape(document[0:N_i-1], np.shape(document[0:N_i-1]) + (1,)), V, alpha, beta, gamma)
 
 
@@ -40,4 +51,3 @@ def likelihood_of_movie(K, document, alpha, beta, V, gamma):
         prob_of_doc += prob_doc_given_theta_s
     prob_of_doc = prob_of_doc / S
     return prob_of_doc
-
