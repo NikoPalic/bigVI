@@ -3,7 +3,7 @@ import sys
 import myVI
 
 
-def perplexity_of_corpus_3(K, corpus, alpha, beta):
+def perplexity_of_corpus(K, corpus, alpha, beta):
     ''' Input:
     K = number of topics
     corpus = collection of M documents
