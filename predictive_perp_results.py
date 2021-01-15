@@ -49,11 +49,11 @@ for km in [5,10]:
 
     alpha, beta, gamma = get_guesses(K, V, M)
 
-    #alpha1, beta1, Gamma, Phi = myVI.full_VI(K,corpus, V, alpha, beta, gamma)
+    #alpha, beta, Gamma, Phi = myVI.full_VI(K,corpus, V, alpha, beta, gamma)
     #alpha, beta = VI_smoothing.full_VI(K,corpus, V, alpha, beta, gamma)
 
     pred_per = collaborative_filtering.predictive_perplexity(K, corpus_test, alpha, beta, V, gamma)
-    #perp3 = document_modeling.perplexity_of_corpus_3(K, corpus_test, alpha, beta)
+   
     pred_perp_array.append(pred_per)
 
 print(pred_perp_array)
