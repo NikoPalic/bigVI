@@ -32,3 +32,44 @@ def ML_parse(file):
         docs.append(np.array(ids.get_group(id)["movieId"].tolist()))
 
     return np.array(docs)   #return as an np array.
+
+
+def vocab(movieset):
+    M=len(movieset)
+    max_array=[]
+    for km in range(M):
+        max_array.append(np.max(movieset[km]))
+    max_gen=np.max(max_array)
+    return max_gen
+
+
+def extract_movie_ids(movieset):
+    M=len(movieset)
+    movie_ids=[]
+    for km in range(M):
+        for kn in range(len(movieset[km])):
+            if not movieset[km][kn] in movie_ids:
+                movie_ids.append(movieset[km][kn])
+    return movie_ids
+
+
+def movieset_process(movieset,movie_ids):
+    M=len(movieset)
+    processed_movie_set=[]
+    for km in range(M):
+        processed_movie = []
+        for kn in range(len(movieset[km])):
+            if movieset[km][kn] in movie_ids:
+                processed_movie.append( np.where(movie_ids == movieset[km][kn])[0][0])
+        processed_movie_set.append(processed_movie)
+    return processed_movie_set
+
+
+#movieset = ML_parse(filename)
+
+#movie_ids = extract_movie_ids(movieset)
+#print(np.shape(movie_ids))
+#processed_set=movieset_process(movieset,movie_ids)
+
+#print(np.shape(processed_set))
+#print(np.shape(processed_set[10]))
