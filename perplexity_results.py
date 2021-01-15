@@ -57,9 +57,9 @@ for km in [5,20,50,100,200]:
     alpha1, beta1, Gamma, Phi = myVI.full_VI(K,corpus, V, alpha, beta, gamma)
     #alpha, beta = VI_smoothing.full_VI(K,corpus, V, alpha, beta, gamma)
 
-    perp3 = document_modeling.perplexity_of_corpus_4(K, corpus_test, alpha, beta1, gamma, V)
-    #perp3 = document_modeling.perplexity_of_corpus_3(K, corpus_test, alpha, beta)
-    perp_array.append(perp3)
+    perp2 = document_modeling.perplexity_of_corpus_2(K, corpus_test, alpha, beta1, gamma, V)
+    
+    perp_array.append(perp2)
 
 print(perp_array)
 plt.plot(perp_array)
