@@ -106,3 +106,65 @@ def full_VI(k, corpus, V, alpha, beta, Gamma):
         #print("Beta\t", beta)
 
     return alpha, beta, Gamma, Phi
+
+
+def VI_for_phi_gamma(k, corpus, V, alpha, beta, Gamma):
+    assemble_dict_to_dict_word_to_position(corpus)
+    M = np.shape(corpus)[1]
+
+    print("M is", M)
+
+    for iteration in range(30):
+        print("iteration ", iteration)
+
+        #update Phi (M x N_i x k)
+        Phi = []
+        for doc_num in range(M):
+            document = corpus[doc_num]
+            gamma = Gamma[doc_num]
+
+            phi = E_phi(beta, gamma, document, k)
+            Phi.append(phi)
+        Phi = np.array(Phi);
+
+
+        #update Gamma (M x k)
+        Gamma = []
+        for doc_num in range(M):
+            phi = Phi[doc_num]
+
+            gamma = E_gamma(alpha, phi)
+            Gamma.append(gamma)
+        Gamma = np.array(Gamma);
+
+
+        print("Gamma\t", Gamma)
+
+        #update beta (k x V)
+        beta = M_beta_2(Phi, corpus, k, V)
+
+        #update alpha (k)
+        alpha = M_alpha(alpha, Gamma, M, k)
+
+        #print("Alpha\t", alpha)
+        #print("Beta\t", beta)
+
+    return Gamma, Phi
+
+
+def M_beta_2(Phi, corpus, k, V):
+    beta = np.zeros(shape=(k, V))
+    M = np.shape(corpus)[1]
+
+    for i in range(k):  # topic
+        for j in range(V):  # word
+            b = 0
+            for doc_num in range(M):  # document index
+                phi = Phi[doc_num]
+                positions = DD[doc_num].get(j)
+                if positions != None:
+                    for n in positions:  # position
+                        b += phi[n, i]
+            beta[i, j] = b
+    beta = normalize(beta, axis=1, norm='l1')
+    return beta
